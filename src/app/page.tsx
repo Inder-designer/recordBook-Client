@@ -1,65 +1,168 @@
-import Image from "next/image";
+"use client"
+
+import { AddBookDialog } from "@/components/dialogs/AddBookDialog";
+import { useRecordHandlers } from "@/components/handlers/record.handlers";
+import HomePageSkeleton from "@/components/Loader/HomePageSkeleton";
+import { UserRoute } from "@/components/Routes/Route";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent } from "@/components/ui/card";
+import { useGetRecordsQuery } from "@/redux/api/record";
+import { IRecord } from "@/types/IRecord";
+import { formatCurrency } from "@/utils/common";
+import { ArrowDownLeft, ArrowUpRight, BookOpen, ChevronRight, Plus, Trash2, Wallet } from "lucide-react";
+import Link from "next/link";
 
 export default function Home() {
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <UserRoute>
+      <HomeContent />
+    </UserRoute>
+  );
+}
+
+export function HomeContent() {
+  const { data: records, isLoading } = useGetRecordsQuery({})
+  const { handleDeleteRecord, deleteRecordLoading } = useRecordHandlers()
+
+  if (isLoading) {
+    return <HomePageSkeleton />;
+  }
+
+  const grandBalance = records.reduce(
+    (sum: number, b: IRecord) => sum + (b.summary?.currentBalance ?? 0),
+    0,
+  );
+
+  return (
+    <UserRoute>
+      <div className="min-h-screen bg-background">
+        <main className="px-4 py-6">
+          <div className="mb-6 rounded-xl border bg-card p-5">
+            <p className="text-sm text-muted-foreground">Net Balance (all books)</p>
+            <p
+              className={`mt-1 text-3xl font-bold ${grandBalance >= 0 ? "text-income" : "text-expense"
+                }`}
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              {formatCurrency(grandBalance)}
+            </p>
+          </div>
+
+          <div className="mb-3 flex items-center justify-between">
+            {/* <div> */}
+              <h2 className="text-lg font-semibold">Your Record Books ({records.length})</h2>
+              {/* <span className="text-sm text-muted-foreground">
+                {records.length} {records.length === 1 ? "book" : "books"}
+              </span> */}
+            {/* </div> */}
+
+            <AddBookDialog />
+          </div>
+
+          {records.length === 0 ? (
+            <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16">
+              <BookOpen className="mb-3 h-10 w-10 text-muted-foreground/50" />
+              <p className="text-muted-foreground">No record books yet</p>
+              <p className="mt-1 text-sm text-muted-foreground/70">
+                Create a book like "House Expense" or "Salary" to get started
+              </p>
+              <div className="mt-4">
+                <AddBookDialog />
+              </div>
+            </div>
+          ) : (
+            <div className="grid gap-3 sm:grid-cols-2">
+              {records.map((book: IRecord) => {
+                return (
+                  <Card
+                    key={book._id}
+                    className="group relative overflow-hidden transition-shadow hover:shadow-md"
+                  >
+                    <Link
+                      href={`/book/${book._id}`}
+                      className="block"
+                    >
+                      <CardContent className="p-5">
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="flex items-center gap-3">
+                            <div className="flex h-11 w-11 items-center justify-center rounded-lg bg-primary/10">
+                              <Wallet className="h-5 w-5 text-primary" />
+                            </div>
+                            <div>
+                              <h3 className="font-semibold text-foreground">
+                                {book.title}
+                              </h3>
+                              <p className="text-xs text-muted-foreground">
+                                {book.summary?.totalTransactions}{" "}
+                                {book.summary?.totalTransactions === 1
+                                  ? "transaction"
+                                  : "transactions"}
+                              </p>
+                            </div>
+                          </div>
+                          <ChevronRight className="h-5 w-5 text-muted-foreground transition-transform group-hover:translate-x-1 mr-5" />
+                        </div>
+
+                        <div className="mt-4 grid grid-cols-3 gap-2 border-t pt-4">
+                          <div>
+                            <p className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                              <ArrowDownLeft className="h-3 w-3 text-income" />
+                              In
+                            </p>
+                            <p className="mt-0.5 text-sm font-medium text-income">
+                              {formatCurrency(book.summary?.totalCashIn ?? 0)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="flex items-center gap-1 text-[10px] uppercase tracking-wide text-muted-foreground">
+                              <ArrowUpRight className="h-3 w-3 text-expense" />
+                              Out
+                            </p>
+                            <p className="mt-0.5 text-sm font-medium text-expense">
+                              {formatCurrency(book.summary?.totalCashOut ?? 0)}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wide text-muted-foreground">
+                              Balance
+                            </p>
+                            <p
+                              className={`mt-0.5 text-sm font-semibold ${(book.summary?.currentBalance ?? 0) >= 0
+                                ? "text-foreground"
+                                : "text-expense"
+                                }`}
+                            >
+                              {formatCurrency(book.summary?.currentBalance ?? 0)}
+                            </p>
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Link>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-2 top-4 h-7 w-7 text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        if (
+                          confirm(
+                            `Delete "${book.title}" and all its transactions?`,
+                          )
+                        ) {
+                          handleDeleteRecord(book._id);
+                        }
+                      }}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                      <span className="sr-only">Delete book</span>
+                    </Button>
+                  </Card>
+                );
+              })}
+            </div>
+          )}
+        </main>
+      </div>
+    </UserRoute>
   );
 }
