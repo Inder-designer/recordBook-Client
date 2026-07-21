@@ -170,30 +170,32 @@ export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordI
                     />
                   </div>
                 </div>
-                <DialogFooter className="mt-4">
-                  {!entry && (
+                <DialogFooter>
+                  <div className="mt-4 flex gap-3">
+                    {!entry && (
+                      <Button
+                        type="submit"
+                        variant="outline"
+                        onClick={() => setAction("saveAndNew")}
+                        disabled={isLoading}
+                      >
+                        Save & Add New
+                      </Button>
+                    )}
                     <Button
                       type="submit"
-                      variant="outline"
-                      onClick={() => setAction("saveAndNew")}
+                      onClick={() => setAction("save")}
                       disabled={isLoading}
                     >
-                      Save & Add New
+                      {isLoading
+                        ? entry
+                          ? "Updating..."
+                          : "Saving..."
+                        : entry
+                          ? "Update"
+                          : "Save"}
                     </Button>
-                  )}
-                  <Button
-                    type="submit"
-                    onClick={() => setAction("save")}
-                    disabled={isLoading}
-                  >
-                    {isLoading
-                      ? entry
-                        ? "Updating..."
-                        : "Saving..."
-                      : entry
-                        ? "Update"
-                        : "Save"}
-                  </Button>
+                  </div>
                 </DialogFooter>
               </Form>
             )}

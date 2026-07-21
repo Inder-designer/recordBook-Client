@@ -57,7 +57,7 @@ export default function RecordDetailClient({
         </div>
       </header>
 
-      <main className="px-4 py-6">
+      <main className="py-4 md:py-6 min-h-[calc(100vh-69px)] bg-black/2 md:bg-transparent">
         {record && <EntriesList record={record} />}
       </main>
     </div>

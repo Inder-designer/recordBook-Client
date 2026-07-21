@@ -18,11 +18,12 @@ export const createEntryValidation = Yup.object({
     amount: Yup.number()
         .typeError("Amount must be a number")
         .positive("Amount must be greater than 0")
+        .max(999999999, "Amount limit reached")
         .required("Amount is required"),
 
     remark: Yup.string()
         .trim()
-        .max(200, "Remark cannot exceed 200 characters"),
+        .max(150, "Remark cannot exceed 150 characters"),
 
     category: Yup.string()
         .trim()
