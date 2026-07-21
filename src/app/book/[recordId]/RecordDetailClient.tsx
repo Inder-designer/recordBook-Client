@@ -46,7 +46,7 @@ export default function RecordDetailClient({
               </Link>
             </Button>
             <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground">
+              <h1 className="text-xl font-bold tracking-tight text-foreground capitalize">
                 {record?.title}
               </h1>
             </div>

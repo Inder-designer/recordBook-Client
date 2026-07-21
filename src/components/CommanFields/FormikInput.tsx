@@ -14,7 +14,7 @@ interface FormikInputProps {
   type?: string;
   className?: string;
   description?: string;
-  options?: { label: React.ReactNode; value: string}[];
+  options?: { label: React.ReactNode; value: string }[];
   step?: number;
   required?: boolean;
   disabled?: boolean;
@@ -189,7 +189,7 @@ export const FormikInput: React.FC<FormikInputProps> = ({
 
   return (
     <div className="space-y-2" >
-      {label && type !== "checkbox" && type !== "radio" && <Label className="text-color2 !mb-1.5 inline-block" htmlFor={name}> {label} <span className="text-red-600">{required && "*"}</span> </Label>}
+      {label && type !== "checkbox" && type !== "radio" && <Label className="text-color2 mb-1.5! inline-block" htmlFor={name}> {label} <span className="text-red-600">{required && "*"}</span> </Label>}
       {renderInput()}
       {description && <p className="text-xs text-gray-500" > {description} </p>}
       {hasError && <p className="text-xs text-red-500" > {meta.error} </p>}

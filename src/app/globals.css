@@ -134,17 +134,45 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
   }
+
   html {
     @apply font-sans;
   }
 }
+
 @layer components {
-  .flexCenter{
-    display: flex;    
+  .flexCenter {
+    display: flex;
     align-items: center;
     justify-content: center;
   }
+}
+
+/* sweet alerts */
+div:where(.swal2-icon) {
+  width: 50px !important;
+  height: 50px !important;
+  margin: 20px auto 0px !important;
+}
+
+div:where(.swal2-icon) .swal2-icon-content {
+  font-size: 40px !important;
+}
+
+div:where(.swal2-container) h2:where(.swal2-title) {
+  font-size: 20px !important;
+}
+
+div:where(.swal2-container) div:where(.swal2-html-container) {
+  font-size: 15px !important;
+  padding: 4px 20px 0 !important;
+}
+
+div:where(.swal2-container) button:where(.swal2-styled) {
+  padding: 6px 16px !important;
+  margin: 0 4px !important;
 }

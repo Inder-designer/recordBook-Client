@@ -5,8 +5,6 @@ import { usePathname } from "next/navigation";
 
 export default function AuthTabs() {
   const pathname = usePathname();
-  console.log(pathname, pathname === "/auth/login");
-  
 
   return (
     <div className="bg-gray-100 rounded-lg p-1 flex mb-8">

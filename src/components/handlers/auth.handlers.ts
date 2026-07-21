@@ -12,7 +12,6 @@ export const useAuthHandlers = () => {
             const response = await login(values).unwrap();
             toast.success("Login successful!");
             router.replace("/");
-            console.log("Login successful:", response);
         } catch (error: any) {
             toast.error(error?.data?.message || "Login failed. Please try again.");
             // Handle login error, e.g., show error message

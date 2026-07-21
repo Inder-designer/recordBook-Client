@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/ApiResponse";
 import { baseApi } from "../baseApi";
-import { ADD_MEMBER, CREATE_RECORD, DELETE_RECORD, GET_RECORD, GET_RECORDS } from "../routes/routes";
+import { ADD_MEMBER, CREATE_RECORD, DELETE_RECORD, GET_RECORD, GET_RECORDS, UPDATE_RECORD } from "../routes/routes";
 import { IRecord } from "@/types/IRecord";
 
 export const RecordApi = baseApi.injectEndpoints({
@@ -18,6 +18,42 @@ export const RecordApi = baseApi.injectEndpoints({
             }),
             transformResponse: (response: ApiResponse) => response.data,
             invalidatesTags: ['RECORDS']
+        }),
+        updateRecord: builder.mutation({
+            query: ({ values, recordId }) => ({
+                url: UPDATE_RECORD(recordId),
+                method: 'PUT',
+                body: values
+            }),
+            transformResponse: (response: ApiResponse) => response.data,
+            async onQueryStarted({ values, recordId }, { dispatch, queryFulfilled }) {
+                let recordsPatch;
+                let recordPatch;
+                try {
+                    await queryFulfilled;
+                    recordPatch = dispatch(
+                        RecordApi.util.updateQueryData("getRecordById", recordId, (draft) => {
+                            if (!draft) return;
+
+                            draft.title = values.title
+                            draft.description = values.description
+                        })
+                    );
+                    recordsPatch = dispatch(
+                        RecordApi.util.updateQueryData("getRecords", {}, (draft) => {
+                            const record = draft.find((r: IRecord) => r._id === recordId);
+
+                            if (!record) return;
+
+                            record.title = values.title
+                            record.description = values.description
+                        })
+                    );
+                } catch {
+                    recordPatch?.undo();
+                    recordsPatch?.undo();
+                }
+            },
         }),
         deleteRecord: builder.mutation({
             query: (recordId) => ({
@@ -42,4 +78,4 @@ export const RecordApi = baseApi.injectEndpoints({
     })
 })
 
-export const { useGetRecordsQuery, useCreateRecordMutation, useDeleteRecordMutation, useGetRecordByIdQuery, useAddMemberMutation } = RecordApi
+export const { useGetRecordsQuery, useUpdateRecordMutation, useCreateRecordMutation, useDeleteRecordMutation, useGetRecordByIdQuery, useAddMemberMutation } = RecordApi

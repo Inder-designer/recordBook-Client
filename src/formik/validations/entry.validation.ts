@@ -43,12 +43,17 @@ const localDate = new Date(
     .toISOString()
     .split("T")[0];
 
-export const entryInitialValues = (type: "cashIn" | "cashOut"): IEntryFormValues => ({
-    type,
-    amount: 0,
-    remark: "",
-    category: "",
-    paymentMethod: "cash",
-    transactionDate: localDate,
+export const entryInitialValues = (
+    type: "cashIn" | "cashOut",
+    entry?: Partial<IEntry>
+): IEntryFormValues => ({
+    type: entry?.type ?? type,
+    amount: entry?.amount ?? 0,
+    remark: entry?.remark ?? "",
+    category: entry?.category ?? "",
+    paymentMethod: entry?.paymentMethod ?? "cash",
+    transactionDate: entry?.transactionDate
+        ? new Date(entry.transactionDate).toISOString().split("T")[0]
+        : localDate,
 });
 

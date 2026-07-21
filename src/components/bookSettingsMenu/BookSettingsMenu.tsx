@@ -6,7 +6,6 @@ import {
     Pencil,
     Settings,
     Trash2,
-    UserPlus,
     Users,
     X,
 } from "lucide-react";
@@ -29,28 +28,25 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
-import { IMember, IRecord } from "@/types/IRecord";
+import { IRecord } from "@/types/IRecord";
 import { MembersDialog } from "../dialogs/MembersDialog";
-// import { useCashBook, type RecordBook } from "@/hooks/use-cash-book";
+import { useRecordHandlers } from "../handlers/record.handlers";
+import { AddAndUpdateBookDialog } from "../dialogs/AddAndUpdateBookDialog";
+import { useSelector } from "react-redux";
+import { RootState } from "@/redux/store/store";
+import { useRecordPermissions } from "@/hooks/useRecordPermissions";
 
-type DialogKind = "rename" | "members" | "clear" | "delete" | null;
+type DialogKind = "rename" | "members" | "clear" | null;
 
 export function BookSettingsMenu({ record }: { record: IRecord }) {
-    const router = useRouter();
-    //   const {
-    //     renameBook,
-    //     duplicateBook,
-    //     deleteBook,
-    //     deleteAllTransactions,
-    //     addMember,
-    //     removeMember,
-    //   } = useCashBook();
+    const { user } = useSelector((state: RootState) => state.auth);
+    const you = record.members.find((m) => m.user._id === user?._id)
+    const { canEditBook } = useRecordPermissions(record)
+    const { handleDeleteRecord } = useRecordHandlers()
 
     const [open, setOpen] = useState<DialogKind>(null);
+    const [isEditOpen, setIsEditOpen] = useState(false);
     const [name, setName] = useState(record.title);
 
     const handleRename = (e: React.FormEvent) => {
@@ -73,12 +69,6 @@ export function BookSettingsMenu({ record }: { record: IRecord }) {
         setOpen(null);
     };
 
-    const handleDeleteBook = () => {
-        // deleteBook(record.id);
-        toast.success("Book deleted");
-        router.push("/");
-    };
-
     return (
         <>
             <DropdownMenu>
@@ -94,15 +84,14 @@ export function BookSettingsMenu({ record }: { record: IRecord }) {
                         <Users className="mr-2 h-4 w-4" />
                         Members
                     </DropdownMenuItem>
-                    <DropdownMenuItem btn
-                        onSelect={() => {
-                            setName(record.title);
-                            setOpen("rename");
-                        }}
-                    >
-                        <Pencil className="mr-2 h-4 w-4" />
-                        Rename book
-                    </DropdownMenuItem>
+                    {canEditBook &&
+                        <DropdownMenuItem btn
+                            onSelect={() => setIsEditOpen(true)}
+                        >
+                            <Pencil className="mr-2 h-4 w-4" />
+                            Rename book
+                        </DropdownMenuItem>
+                    }
                     <DropdownMenuItem btn onSelect={handleDuplicate}>
                         <Copy className="mr-2 h-4 w-4" />
                         Duplicate this book
@@ -116,55 +105,34 @@ export function BookSettingsMenu({ record }: { record: IRecord }) {
                         Delete all entries
                     </DropdownMenuItem>
                     <DropdownMenuItem btn
-                        onSelect={() => setOpen("delete")}
+                        onSelect={() => handleDeleteRecord(record._id)}
                         className="text-destructive focus:text-destructive"
                     >
                         <Trash2 className="mr-2 h-4 w-4" />
                         Delete book
                     </DropdownMenuItem>
                 </DropdownMenuContent>
-            </DropdownMenu>
+            </DropdownMenu >
 
             {/* Rename */}
-            <Dialog open={open === "rename"} onOpenChange={(v) => !v && setOpen(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Rename book</DialogTitle>
-                    </DialogHeader>
-                    <form id="rename-form" onSubmit={handleRename} className="space-y-4">
-                        <div className="space-y-2">
-                            <Label htmlFor="book-name">Book name</Label>
-                            <Input
-                                id="book-name"
-                                value={name}
-                                onChange={(e) => setName(e.target.value)}
-                                autoFocus
-                                required
-                            />
-                        </div>
-                    </form>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
-                        </DialogClose>
-                        <Button type="submit" form="rename-form">
-                            Save
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            {isEditOpen &&
+                < AddAndUpdateBookDialog
+                    open={isEditOpen}
+                    onOpenChange={setIsEditOpen}
+                    record={record}
+                />
+            }
 
             {/* Members */}
-            <MembersDialog
-                open={open === "members"}
+            < MembersDialog
+                open={open === "members"
+                }
                 onOpenChange={(v) => !v && setOpen(null)}
                 record={record}
             />
 
             {/* Clear entries */}
-            <Dialog open={open === "clear"} onOpenChange={(v) => !v && setOpen(null)}>
+            < Dialog open={open === "clear"} onOpenChange={(v) => !v && setOpen(null)}>
                 <DialogContent>
                     <DialogHeader>
                         <DialogTitle>Delete all entries?</DialogTitle>
@@ -184,30 +152,7 @@ export function BookSettingsMenu({ record }: { record: IRecord }) {
                         </Button>
                     </DialogFooter>
                 </DialogContent>
-            </Dialog>
-
-            {/* Delete book */}
-            <Dialog open={open === "delete"} onOpenChange={(v) => !v && setOpen(null)}>
-                <DialogContent>
-                    <DialogHeader>
-                        <DialogTitle>Delete this book?</DialogTitle>
-                        <DialogDescription>
-                            <b>{record.title}</b> and all its transactions will be permanently
-                            removed.
-                        </DialogDescription>
-                    </DialogHeader>
-                    <DialogFooter>
-                        <DialogClose asChild>
-                            <Button type="button" variant="outline">
-                                Cancel
-                            </Button>
-                        </DialogClose>
-                        <Button variant="destructive" onClick={handleDeleteBook}>
-                            Delete book
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+            </Dialog >
         </>
     );
 }

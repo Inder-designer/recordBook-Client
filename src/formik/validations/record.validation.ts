@@ -1,11 +1,13 @@
+import { IRecord } from "@/types/IRecord";
 import * as Yup from "yup";
+import { emailValidation } from "./Comman";
 
 export interface IRecordFormValues {
     title: string;
     description: string;
 }
 
-export const createRecordValidation =
+export const recordValidation =
     Yup.object().shape({
         title: Yup
             .string()
@@ -27,8 +29,15 @@ export const createRecordValidation =
             )
     })
 
-export const recordInitialValues: IRecordFormValues = {
-    title: "",
-    description: ""
-}
+export const recordInitialValues = (
+    data?: Partial<IRecord>
+): IRecordFormValues => ({
+    title: data?.title ?? "",
+    description: data?.description ?? "",
+});
+
+export const addMemberValidation =
+    Yup.object().shape({
+        email: emailValidation
+    })
 

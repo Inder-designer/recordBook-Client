@@ -53,7 +53,6 @@ interface AddMemberProps {
 }
 
 const AddMember = ({ user, recordId, onBack, onSuccess }: AddMemberProps) => {
-    console.log("🚀 ~ AddMember ~ user:", user)
     const { handleAddMember, addMemberLoading } = useRecordHandlers()
     const [role, setRole] = useState<number>(3)
     const selectedRole = roleInfo.find((item) => item.role === role);
@@ -61,7 +60,6 @@ const AddMember = ({ user, recordId, onBack, onSuccess }: AddMemberProps) => {
         memberId: user?._id,
         role: role
     }
-    console.log("🚀 ~ AddMember ~ data:", data)
     return (
         <div>
             <DialogHeader>
@@ -70,7 +68,7 @@ const AddMember = ({ user, recordId, onBack, onSuccess }: AddMemberProps) => {
             <div className="mt-4">
                 <div className="border rounded p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="bg-gray-400 text-white w-5 h-5 rounded-full flex items-center justify-center">{user?.initials}</span>
+                        <span className="bg-gray-400 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg">{user?.initials}</span>
                         <div>
                             <p className="text-lg font-medium capitalize">{user?.fullName}</p>
                             <p className="">{user?.email}</p>

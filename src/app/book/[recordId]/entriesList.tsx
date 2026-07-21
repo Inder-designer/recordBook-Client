@@ -1,5 +1,5 @@
 "use client"
-import { AddTransactionDialog } from "@/components/dialogs/AddTransactionDialog";
+import { AddAndEditTransactionDialog } from "@/components/dialogs/AddAndEditTransactionDialog";
 import { DeleteEntryDialog } from "@/components/dialogs/DeleteEntryDialog";
 import { useEntryHandlers } from "@/components/handlers/entry.handlers";
 import TransactionsTableSkeleton from "@/components/Loader/TransactionsTableSkeleton";
@@ -7,15 +7,14 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Table, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { useRecordPermissions } from "@/hooks/useRecordPermissions";
 import { useGetEntriesQuery } from "@/redux/api/entry";
-import { RootState } from "@/redux/store/store";
 import { IEntry } from "@/types/IEntry";
 import { IRecord, IRecordSummary } from "@/types/IRecord";
-import { formatCurrency, formatDate } from "@/utils/common";
+import { formatCurrency, formatDate, } from "@/utils/common";
 import TableBody from "@mui/material/TableBody";
-import { ArrowDownLeft, ArrowUpRight, Trash2, Wallet } from "lucide-react";
+import { ArrowDownLeft, ArrowUpRight, Edit, Trash2, Wallet } from "lucide-react";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 
 interface EntriesListProps {
     record: IRecord;
@@ -24,13 +23,15 @@ interface EntriesListProps {
 export default function EntriesList({
     record,
 }: EntriesListProps) {
-    const { user } = useSelector((state: RootState) => state.auth);
+    const { user, canManageEntries, canAddEntry } = useRecordPermissions(record);
     const { data: entries = [], isLoading } =
         useGetEntriesQuery(record?._id ?? "", {
             skip: !record?._id,
         });
     const { handleDeleteEntry, deleteEntryLoading } = useEntryHandlers()
     const [selectedEntry, setSelectedEntry] = useState<IEntry | null>(null);
+    const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+    const [isEditOpen, setIsEditOpen] = useState(false);
 
     if (isLoading) {
         return <TransactionsTableSkeleton />;
@@ -133,28 +134,31 @@ export default function EntriesList({
             <div>
                 <div className="flex items-center justify-between mb-3">
                     <h2 className="text-lg font-semibold">
-                        Transactions <span className="text-base">({summary.totalTransactions})</span>
+                        Entries <span className="text-base">({summary.totalTransactions})</span>
                     </h2>
-                    <div className="flex gap-2">
-                        <AddTransactionDialog recordId={record?._id} type="cashIn" />
-                        <AddTransactionDialog recordId={record?._id} type="cashOut" />
-                    </div>
+                    {canAddEntry && (
+                        <div className="flex gap-2">
+                            <AddAndEditTransactionDialog recordId={record?._id} type="cashIn" />
+                            <AddAndEditTransactionDialog recordId={record?._id} type="cashOut" />
+                        </div>
+                    )}
                 </div>
 
                 {!entries.length ? (
                     <div className="flex flex-col items-center justify-center rounded-xl border border-dashed py-16">
-                        <Wallet className="mb-3 h-10 w-10 text-muted-foreground/50" />
-                        <p className="text-muted-foreground">No transactions yet</p>
-                        <p className="mt-1 text-sm text-muted-foreground/70">
+                        <Wallet className="mb-3 h-10 w-10 text-gray-600" />
+                        <p className="text-gray-600 text-lg">No entries added Yet!</p>
+                        <p className="mt-2 text-sm text-gray-500">
                             Add your first entry to {record.title}
                         </p>
-                        <div className="mt-4 flex gap-2">
-                            <AddTransactionDialog recordId={record?._id} type="cashIn" />
-                            <AddTransactionDialog recordId={record?._id} type="cashOut" />
-                        </div>
+                        {canAddEntry && (
+                            <div className="mt-2 flex gap-2">
+                                <AddAndEditTransactionDialog recordId={record?._id} type="cashIn" />
+                                <AddAndEditTransactionDialog recordId={record?._id} type="cashOut" />
+                            </div>
+                        )}
                     </div>
                 ) : (
-                    // <></>
                     <div className="rounded-lg border relative">
                         <Table>
                             <TableHeader className="sticky top-0 z-10">
@@ -208,15 +212,28 @@ export default function EntriesList({
                                             {formatCurrency(tx.balance)}
                                         </TableCell>
                                         <TableCell className="whitespace-nowrap pr-4 text-right">
-                                            <Button
-                                                variant="ghost"
-                                                size="icon"
-                                                className="h-8 w-8 text-muted-foreground hover:text-destructive"
-                                                onClick={() => setSelectedEntry(tx)}
-                                            >
-                                                <Trash2 className="h-4 w-4" />
-                                                <span className="sr-only">Delete</span>
-                                            </Button>
+                                            {canManageEntries && (
+                                                <>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                        onClick={() => { setSelectedEntry(tx); setIsEditOpen(true) }}
+                                                    >
+                                                        <Edit className="h-4 w-4" />
+                                                        <span className="sr-only">Delete</span>
+                                                    </Button>
+                                                    <Button
+                                                        variant="ghost"
+                                                        size="icon"
+                                                        className="h-8 w-8 text-muted-foreground hover:text-destructive"
+                                                        onClick={() => { setSelectedEntry(tx); setIsDeleteOpen(true) }}
+                                                    >
+                                                        <Trash2 className="h-4 w-4" />
+                                                        <span className="sr-only">Delete</span>
+                                                    </Button>
+                                                </>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 ))}
@@ -224,11 +241,20 @@ export default function EntriesList({
                         </Table>
                     </div>
                 )}
-                {selectedEntry && (
+                {selectedEntry && isEditOpen &&
+                    <AddAndEditTransactionDialog
+                        open={isEditOpen}
+                        onOpenChange={setIsEditOpen}
+                        entry={selectedEntry}
+                        recordId={record._id}
+                        type={selectedEntry.type}
+                    />
+                }
+                {selectedEntry && isDeleteOpen && (
                     <DeleteEntryDialog
                         open
                         onOpenChange={(open) => {
-                            if (!open) setSelectedEntry(null);
+                            if (!open) { setSelectedEntry(null); setIsDeleteOpen(false) };
                         }}
                         loading={deleteEntryLoading}
                         entry={selectedEntry}

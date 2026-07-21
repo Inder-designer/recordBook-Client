@@ -1,6 +1,6 @@
 import { ApiResponse } from "@/types/ApiResponse";
 import { baseApi } from "../baseApi";
-import { CREATE_ENTRY, DELETE_ENTRY, GET_ENTRIES } from "../routes/routes";
+import { CREATE_ENTRY, DELETE_ENTRY, GET_ENTRIES, UPDATE_ENTRY } from "../routes/routes";
 import { IEntry } from "@/types/IEntry";
 import { RecordApi } from "./record";
 import { IRecord } from "@/types/IRecord";
@@ -42,6 +42,49 @@ export const EntryApi = baseApi.injectEndpoints({
 
                                 if (!record) return;
 
+                                updateSummary(record.summary, entry, 1);
+                            })
+                        );
+                    } catch {
+                        entriesPatch?.undo();
+                        recordsPatch?.undo();
+                    }
+                },
+            }),
+            editEntry: builder.mutation({
+                query: ({ data, recordId, entryId }) => ({
+                    url: UPDATE_ENTRY(recordId, entryId),
+                    method: 'PUT',
+                    body: data
+                }),
+                transformResponse: (response: ApiResponse) => response.data,
+                async onQueryStarted({ recordId, entryId }, { dispatch, queryFulfilled }) {
+                    let entriesPatch;
+                    let recordsPatch;
+                    try {
+                        await queryFulfilled;
+                        const { data: entry } = await queryFulfilled;
+                        let previousEntry: IEntry | undefined;
+                        entriesPatch = dispatch(
+                            EntryApi.util.updateQueryData(
+                                "getEntries",
+                                recordId,
+                                (draft) => {
+                                    const entryIndex = draft.findIndex((e) => e._id === entryId);
+
+                                    if (entryIndex === -1) return;
+                                    previousEntry = { ...draft[entryIndex] };
+                                    Object.assign(draft[entryIndex], entry);
+                                }
+                            )
+                        );
+                        recordsPatch = dispatch(
+                            RecordApi.util.updateQueryData("getRecords", {}, (draft) => {
+                                const record = draft.find((r: IRecord) => r._id === recordId);
+
+                                if (!record || !previousEntry) return;
+
+                                updateSummary(record.summary, previousEntry, -1);
                                 updateSummary(record.summary, entry, 1);
                             })
                         );
@@ -115,4 +158,4 @@ export const EntryApi = baseApi.injectEndpoints({
     }
 })
 
-export const { useGetEntriesQuery, useCreateEntryMutation, useDeleteEntryMutation } = EntryApi
+export const { useGetEntriesQuery, useCreateEntryMutation, useEditEntryMutation, useDeleteEntryMutation } = EntryApi

@@ -16,58 +16,76 @@ import { Form, Formik } from "formik";
 import { createEntryValidation, entryInitialValues } from "@/formik/validations/entry.validation";
 import { FormikInput } from "../CommanFields/FormikInput";
 import { useEntryHandlers } from "../handlers/entry.handlers";
-// import { useCashBook, type TransactionType } from "@/hooks/use-cash-book";
+import { IEntry } from "@/types/IEntry";
 
 interface Props {
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  entry?: IEntry;
   recordId: string | undefined;
   type: "cashIn" | "cashOut";
   trigger?: ReactNode;
 }
 
-export function AddTransactionDialog({ recordId, type, trigger }: Props) {
-  const { handleCreateEntry, createEntryLoading } = useEntryHandlers()
-  const [isOpen, setIsOpen] = useState(false);
+const options = [
+  {
+    label: "Cash",
+    value: "cash"
+  },
+  {
+    label: "Online",
+    value: "online"
+  },
+]
+export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordId, type, trigger }: Props) {
+  const [entryType, setEntryType] = useState(entry?.type || type)
+  const { handleSaveEntry, isLoading } = useEntryHandlers()
   const [action, setAction] = useState<"save" | "saveAndNew">("save");
+  const [internalOpen, setInternalOpen] = useState(false);
 
-  const options = [
-    {
-      label: "Cash",
-      value: "cash"
-    },
-    {
-      label: "Online",
-      value: "online"
-    },
-  ]
+  const isControlled = open !== undefined;
+
+  const dialogOpen = isControlled ? open : internalOpen;
+
+  const setDialogOpen = (value: boolean) => {
+    if (isControlled) {
+      onOpenChange?.(value);
+    } else {
+      setInternalOpen(value);
+    }
+  };
 
   return (
-    <Dialog open={isOpen} onOpenChange={setIsOpen}>
-      <DialogTrigger asChild>
-        {trigger ?? (
-          <Button size="sm">
-            {type === "cashIn" ?
-              <Plus className="mr-1 h-4 w-4" /> :
-              <Minus className="mr-1 h-4 w-4" />
-            }
+    <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
+      {!isControlled && (
+        <DialogTrigger asChild>
+          {trigger ?? (
+            <Button size="sm" variant={entryType === "cashIn" ? "default" : "destructive"}>
+              {entryType === "cashIn" ?
+                <Plus className="h-4 w-4" /> :
+                <Minus className="h-4 w-4" />
+              }
 
-            {type === "cashIn" ? "Cash In" : "Cash Out"}
-          </Button>
-        )}
-      </DialogTrigger>
+              {entryType === "cashIn" ? "Cash In" : "Cash Out"}
+            </Button>
+          )}
+        </DialogTrigger>
+      )}
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Add Transaction</DialogTitle>
+          <DialogTitle>{entry ? "Edit" : "Add"}{" "}  <span>{entryType === "cashIn" ? "Cash In" : "Cash Out"}</span> Entry</DialogTitle>
         </DialogHeader>
         <div>
-          <Formik
-            initialValues={entryInitialValues(type)}
+          <Formik key={entry?._id ?? type}
+            initialValues={entryInitialValues(type, entry)}
             validationSchema={createEntryValidation}
             enableReinitialize
             onSubmit={(values, { resetForm }) => {
               if (!recordId) return;
-              handleCreateEntry(values, recordId, () => {
+
+              const onSuccess = () => {
                 if (action === "save") {
-                  setIsOpen(false);
+                  setDialogOpen(false);
                 } else {
                   resetForm({
                     values: {
@@ -76,9 +94,14 @@ export function AddTransactionDialog({ recordId, type, trigger }: Props) {
                     },
                   });
                 }
-              })
-            }
-            }
+              };
+
+              if (entry) {
+                handleSaveEntry({ values, recordId, entryId: entry._id, onSuccess });
+              } else {
+                handleSaveEntry({ values, recordId, onSuccess });
+              }
+            }}
           >
             {({ values, setFieldValue }) => (
               <Form>
@@ -87,7 +110,7 @@ export function AddTransactionDialog({ recordId, type, trigger }: Props) {
                     {/* <Label>Type</Label> */}
                     <div className="flex gap-2">
                       <div
-                        onClick={() => setFieldValue("type", "cashIn")}
+                        onClick={() => { setEntryType("cashIn"), setFieldValue("type", "cashIn") }}
                         className={`flex flex-1 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${values.type === "cashIn"
                           ? "border-income bg-income-bg text-income"
                           : "border-input bg-background text-muted-foreground hover:bg-accent"
@@ -97,7 +120,7 @@ export function AddTransactionDialog({ recordId, type, trigger }: Props) {
                         Cash In
                       </div>
                       <div
-                        onClick={() => setFieldValue("type", "cashOut")}
+                        onClick={() => { setEntryType("cashOut"), setFieldValue("type", "cashOut") }}
                         className={`flex flex-1 items-center justify-center gap-2 rounded-md border px-4 py-2 text-sm font-medium transition-colors cursor-pointer ${values.type === "cashOut"
                           ? "border-expense bg-expense-bg text-expense"
                           : "border-input bg-background text-muted-foreground hover:bg-accent"
@@ -148,20 +171,28 @@ export function AddTransactionDialog({ recordId, type, trigger }: Props) {
                   </div>
                 </div>
                 <DialogFooter className="mt-4">
+                  {!entry && (
+                    <Button
+                      type="submit"
+                      variant="outline"
+                      onClick={() => setAction("saveAndNew")}
+                      disabled={isLoading}
+                    >
+                      Save & Add New
+                    </Button>
+                  )}
                   <Button
                     type="submit"
-                    variant="outline"
-                    disabled={createEntryLoading}
-                    onClick={() => setAction("saveAndNew")}
-                  >
-                    Save & Add New
-                  </Button>
-                  <Button
-                    type="submit"
-                    disabled={createEntryLoading}
                     onClick={() => setAction("save")}
+                    disabled={isLoading}
                   >
-                    {createEntryLoading ? "Saving..." : "Save"}
+                    {isLoading
+                      ? entry
+                        ? "Updating..."
+                        : "Saving..."
+                      : entry
+                        ? "Update"
+                        : "Save"}
                   </Button>
                 </DialogFooter>
               </Form>

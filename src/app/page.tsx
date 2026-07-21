@@ -1,6 +1,6 @@
 "use client"
 
-import { AddBookDialog } from "@/components/dialogs/AddBookDialog";
+import { AddAndUpdateBookDialog } from "@/components/dialogs/AddAndUpdateBookDialog";
 import { useRecordHandlers } from "@/components/handlers/record.handlers";
 import HomePageSkeleton from "@/components/Loader/HomePageSkeleton";
 import { UserRoute } from "@/components/Routes/Route";
@@ -49,13 +49,13 @@ export function HomeContent() {
 
           <div className="mb-3 flex items-center justify-between">
             {/* <div> */}
-              <h2 className="text-lg font-semibold">Your Record Books ({records.length})</h2>
-              {/* <span className="text-sm text-muted-foreground">
+            <h2 className="text-lg font-semibold">Your Record Books ({records.length})</h2>
+            {/* <span className="text-sm text-muted-foreground">
                 {records.length} {records.length === 1 ? "book" : "books"}
               </span> */}
             {/* </div> */}
 
-            <AddBookDialog />
+            <AddAndUpdateBookDialog />
           </div>
 
           {records.length === 0 ? (
@@ -66,7 +66,7 @@ export function HomeContent() {
                 Create a book like "House Expense" or "Salary" to get started
               </p>
               <div className="mt-4">
-                <AddBookDialog />
+                <AddAndUpdateBookDialog />
               </div>
             </div>
           ) : (
@@ -88,7 +88,7 @@ export function HomeContent() {
                               <Wallet className="h-5 w-5 text-primary" />
                             </div>
                             <div>
-                              <h3 className="font-semibold text-foreground">
+                              <h3 className="font-semibold text-foreground capitalize">
                                 {book.title}
                               </h3>
                               <p className="text-xs text-muted-foreground">
@@ -140,18 +140,10 @@ export function HomeContent() {
                     <Button
                       variant="ghost"
                       size="icon"
-                      className="absolute right-2 top-4 h-7 w-7 text-muted-foreground opacity-0 hover:text-destructive group-hover:opacity-100"
-                      onClick={(e) => {
-                        e.preventDefault();
-                        e.stopPropagation();
-                        if (
-                          confirm(
-                            `Delete "${book.title}" and all its transactions?`,
-                          )
-                        ) {
-                          handleDeleteRecord(book._id);
-                        }
-                      }}
+                      className="absolute right-2 top-4 h-7 w-7 text-muted-foreground lg:opacity-0 hover:text-destructive group-hover:opacity-100"
+                      onClick={() =>
+                        handleDeleteRecord(book._id)
+                      }
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Delete book</span>
@@ -162,7 +154,7 @@ export function HomeContent() {
             </div>
           )}
         </main>
-      </div>
-    </UserRoute>
+      </div >
+    </UserRoute >
   );
 }

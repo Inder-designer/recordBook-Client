@@ -6,6 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { ReduxProvider } from "@/redux/provider/ReduxProvider";
 import AuthProvider from "@/components/providers/AuthProvider";
 import MainLayout from "@/components/Layout/MainLayout";
+// import 'sweetalert2/src/sweetalert2.scss'
+import "sweetalert2/dist/sweetalert2.min.css";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
