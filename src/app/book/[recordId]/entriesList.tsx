@@ -198,15 +198,17 @@ export default function EntriesList({
                                                 "-"
                                                 : (
                                                     <>
-                                                        {
-                                                            tx.paymentMethod &&
-                                                            <span className="w-fit tracking-wider rounded capitalize font-medium inline-block px-3 py-1 bg-purple-200 text-purple-600">{tx.paymentMethod}</span>
-                                                        }
-                                                        {tx.category &&
-                                                            <span className="w-fit rounded capitalize inline-block px-3 py-1 bg-indigo-600 text-bg-indigo-200">{tx.category}</span>
-                                                        }
+                                                        <div className="flex gap-2">
+                                                            {
+                                                                tx.paymentMethod &&
+                                                                <span className="tracking-wider rounded capitalize font-medium inline-block px-3 py-1 bg-purple-100 text-purple-500">{tx.paymentMethod}</span>
+                                                            }
+                                                            {tx.category &&
+                                                                <span className="rounded capitalize font-medium inline-block px-3 py-1 text-indigo-500 bg-indigo-100">{tx.category}</span>
+                                                            }
+                                                        </div>
                                                         {tx.remark &&
-                                                            <p className="mt-1.5 text-gray-700 text-sm">{tx.remark}</p>
+                                                            <p className="mt-1.5 text-gray-700 text-xs sm:text-sm">{tx.remark}</p>
                                                         }
                                                     </>
                                                 )
@@ -216,7 +218,7 @@ export default function EntriesList({
                                             <span className={`font-medium ${tx.type === "cashIn" ? "text-income" : "text-expense"}`}>
                                                 {formatCurrency(tx.amount)}
                                             </span>
-                                            <span className={`text-sm text-gray-600`}>
+                                            <span className={`text-xs sm:text-sm text-muted-foreground`}>
                                                 Balance: {formatCurrency(tx.balance)}
                                             </span>
                                         </div>
@@ -224,7 +226,7 @@ export default function EntriesList({
                                     <div className="flex justify-between items-center gap-10 border-t pt-2.5 mt-2.5">
                                         <div className="flex items-end gap-2">
                                             <p
-                                                className={`flex-1 truncate text-sm font-medium ${tx.createdBy._id === user?._id
+                                                className={`flex-1 truncate text-xs sm:text-sm font-medium ${tx.createdBy._id === user?._id
                                                     ? "text-indigo-600"
                                                     : "text-emerald-600"
                                                     }`}
