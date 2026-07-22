@@ -85,13 +85,17 @@ export default function page() {
                                     {edit === "name" && (
                                         <div className="mt-2 flex justify-end gap-4">
                                             <Button
+                                                disabled={isLoading}
                                                 variant={"outline"}
                                                 onClick={() => { resetForm(); handleCancelEdit() }}
                                             >
                                                 Cancel
                                             </Button>
-                                            <Button>
-                                                Update
+                                            <Button
+                                                type="submit"
+                                                disabled={isLoading}
+                                            >
+                                                {isLoading ? "Updating..." : "Update"}
                                             </Button>
                                         </div>
                                     )}
