@@ -3,8 +3,10 @@ import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSepara
 import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
 import { useLogoutMutation } from "@/redux/baseApi";
+import { useRouter } from "next/navigation";
 
 export function ProfileMenu() {
+    const router = useRouter()
     const { user } = useSelector((state: RootState) => state.auth);
     const [logOut] = useLogoutMutation()
     return (
@@ -31,7 +33,7 @@ export function ProfileMenu() {
                     </div>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-60 p-0">
-                    <DropdownMenuItem btn>
+                    <DropdownMenuItem btn onSelect={() => router.push("/profile")}>
                         <div
                             className="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent"
                         >

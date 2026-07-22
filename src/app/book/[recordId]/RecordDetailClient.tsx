@@ -36,28 +36,30 @@ export default function RecordDetailClient({
   }
   return (
     <div className="min-h-screen bg-background">
-      <header className="border-b bg-card">
-        <div className="flex items-center justify-between gap-3 px-4 py-4">
-          <div className="flex items-center gap-3">
-            <Button variant="ghost" size="icon" asChild>
-              <Link href="/">
-                <ArrowLeft className="h-5 w-5" />
-                <span className="sr-only">Back</span>
-              </Link>
-            </Button>
-            <div>
-              <h1 className="text-xl font-bold tracking-tight text-foreground capitalize">
-                {record?.title}
-              </h1>
+      <div className="border-b">
+        <header className="max-w-350 mx-auto bg-card">
+          <div className="flex items-center justify-between gap-3 px-4 py-4">
+            <div className="flex items-center gap-3">
+              <Button variant="ghost" size="icon" asChild>
+                <Link href="/">
+                  <ArrowLeft className="h-5 w-5" />
+                  <span className="sr-only">Back</span>
+                </Link>
+              </Button>
+              <div>
+                <h1 className="text-xl font-bold tracking-tight text-foreground capitalize">
+                  {record?.title}
+                </h1>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              {record && <BookSettingsMenu record={record} />}
             </div>
           </div>
-          <div className="flex items-center gap-2">
-            {record && <BookSettingsMenu record={record} />}
-          </div>
-        </div>
-      </header>
+        </header>
+      </div>
 
-      <main className="py-4 md:py-6 min-h-[calc(100vh-69px)] bg-black/2 md:bg-transparent">
+      <main className="max-w-350 mx-auto py-4 md:py-6 min-h-[calc(100vh-69px)] bg-black/2 md:bg-transparent">
         {record && <EntriesList record={record} />}
       </main>
     </div>

@@ -35,7 +35,7 @@ export function HomeContent() {
 
   return (
     <UserRoute>
-      <div className="min-h-screen bg-background">
+      <div className="max-w-350 mx-auto min-h-screen bg-background">
         <main className="px-4 py-6">
           <div className="mb-6 rounded-xl border bg-card p-5">
             <p className="text-sm text-muted-foreground">Net Balance (all books)</p>

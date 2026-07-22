@@ -179,7 +179,7 @@ export const FormikInput: React.FC<FormikInputProps> = ({
             disabled={disabled}
             placeholder={type === "date" && !field.value ? "" : placeholder}
             min={type === "date" ? min : undefined}
-            className={`${hasError ? "border-red-500" : ""} !focus-visible:ring-0 !ring-0 !focus:border-primary focus-visible:border-primary h-10 ${className}`}
+            className={`${hasError ? "border-red-500" : ""} !focus-visible:ring-0 ring-0! !focus:border-primary focus-visible:border-primary h-10 ${className}`}
             {...field}
             {...props}
           />

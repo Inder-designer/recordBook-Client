@@ -16,6 +16,17 @@ export function formatDate(dateStr: string) {
   });
 }
 
+export const capitalizeWords = (text?: string) =>
+  text
+    ?.trim()
+    .split(/\s+/)
+    .map(
+      (word) =>
+        word.charAt(0).toUpperCase() +
+        word.slice(1).toLowerCase()
+    )
+    .join(" ") ?? "";
+
 export const updateSummary = (
   summary: IRecordSummary,
   entry: IEntry,

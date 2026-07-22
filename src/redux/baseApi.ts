@@ -1,9 +1,9 @@
 import { createApi, fetchBaseQuery } from '@reduxjs/toolkit/query/react'
-import { ACCOUNT_VERIFY, FIND_USER, FORGOT_PASSWORD, GET_ME, LOGIN, LOGOUT, OTP_VERIFY, REGISTER, RESET_PASSWORD } from './routes/routes';
+import { ACCOUNT_VERIFY, FIND_USER, FORGOT_PASSWORD, GET_ME, LOGIN, LOGOUT, OTP_VERIFY, REGISTER, RESET_PASSWORD, UPDATE_USER } from './routes/routes';
 import { BaseQueryFn, FetchArgs, FetchBaseQueryError } from '@reduxjs/toolkit/query';
 import { BaseQueryApi } from '@reduxjs/toolkit/query/react';
 import { ApiResponse, ErrResponse } from '@/types/ApiResponse';
-import { clearUser } from './Slices/AuthSlice';
+import { clearUser, updateName } from './Slices/AuthSlice';
 
 const baseQuery = fetchBaseQuery({
     baseUrl: process.env.NEXT_PUBLIC_LIVE_API_URL,
@@ -63,6 +63,24 @@ export const baseApi = createApi({
                 body: data
             })
         }),
+        updateUser: builder.mutation({
+            query: (data) => ({
+                url: UPDATE_USER,
+                method: 'PATCH',
+                body: data
+            }),
+            transformResponse: (response: ApiResponse) => response.data,
+            async onQueryStarted(data, { dispatch, queryFulfilled }) {
+                console.log(data);
+                
+                try {
+                    await queryFulfilled;
+                    dispatch(updateName(data));
+                } catch (error) {
+                    console.error("Logout failed: ", error);
+                }
+            },
+        }),
         forgotPassword: builder.mutation({
             query: (data) => ({
                 url: FORGOT_PASSWORD,
@@ -111,4 +129,4 @@ export const baseApi = createApi({
     })
 })
 
-export const { useGetMeQuery, useFindUserQuery, useLoginMutation, useLogoutMutation, useRegisterMutation, useForgotPasswordMutation, useOtpVerifyMutation, useVerifyAccountMutation, useResetPaswordMutation } = baseApi;
+export const { useGetMeQuery, useFindUserQuery, useLoginMutation, useLogoutMutation, useRegisterMutation, useUpdateUserMutation, useForgotPasswordMutation, useOtpVerifyMutation, useVerifyAccountMutation, useResetPaswordMutation } = baseApi;

@@ -4,6 +4,7 @@ export const LOGIN = "/user/login";
 export const LOGOUT = "/user/logout";
 export const REGISTER = "/user/signup";
 export const GET_ME = "/user";
+export const UPDATE_USER = "/user/update";
 export const FORGOT_PASSWORD = "/user/forgot-password";
 export const OTP_VERIFY = "/user/verify-otp";
 export const ACCOUNT_VERIFY = "/user/verify-account";

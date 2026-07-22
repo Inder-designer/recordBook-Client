@@ -8,12 +8,16 @@ export default function MainLayout({
     children: React.ReactNode;
 }) {
     const pathname = usePathname();
-    const isHomePage = pathname === "/";
+    const showHeader = [
+        "/",
+        "/profile"
+    ];
+    const isHomePage = showHeader.includes(pathname || "");
     // const { isLoading } = use();
 
     // if (isLoading) return <Loader />;
     return (
-        <div className="relative max-w-300 w-full mx-auto">
+        <div className="relative w-full mx-auto">
             {isHomePage && <Header />}
             <div className={``}>{children}</div>
         </div>
