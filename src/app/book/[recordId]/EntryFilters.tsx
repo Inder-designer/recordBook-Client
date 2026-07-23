@@ -76,7 +76,7 @@ export default function EntryFilters({
     }, [calendarOpen, filters.startDate, filters.endDate]);
     return (
         <div className="mb-6 px-4">
-            <div className="flex gap-4">
+            <div className="flex flex-wrap gap-4">
                 {/* Entry Type */}
                 <div className="space-y-2">
                     <Select
@@ -91,7 +91,7 @@ export default function EntryFilters({
                         }
 
                     >
-                        <SelectTrigger className="text-primary/80 rounded">
+                        <SelectTrigger className="text-primary/80 rounded bg-white">
                             Types: <SelectValue placeholder="All" />
                         </SelectTrigger>
 
@@ -120,7 +120,7 @@ export default function EntryFilters({
                             })
                         }
                     >
-                        <SelectTrigger className="text-primary/80 rounded">
+                        <SelectTrigger className="text-primary/80 rounded bg-white">
                             Payment modes: <SelectValue placeholder="All" />
                         </SelectTrigger>
 
@@ -151,7 +151,7 @@ export default function EntryFilters({
                             })
                         }
                     >
-                        <SelectTrigger className="text-primary/80 rounded">
+                        <SelectTrigger className="text-primary/80 rounded bg-white">
                             Members: <SelectValue placeholder="All" />
                         </SelectTrigger>
 

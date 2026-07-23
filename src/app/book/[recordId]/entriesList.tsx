@@ -60,7 +60,7 @@ export default function EntriesList({
                         })
                     }
                     members={record.members}
-                />;
+                />
             </>
             {summary &&
                 <EntrySummary summary={summary} />
