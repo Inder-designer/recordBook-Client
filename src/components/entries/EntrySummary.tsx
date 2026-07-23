@@ -24,13 +24,13 @@ export default function EntrySummary({ summary }: { summary: IRecordSummary }) {
             </div>
             <div className="mb-6 hidden md:grid gap-4 sm:grid-cols-3">
                 <Card>
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2! p-4">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <ArrowDownLeft className="h-4 w-4 text-income" />
                             Total Cash In
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='p-4 pt-0'>
                         <p className="text-2xl font-bold text-income">
                             {formatCurrency(summary.totalCashIn)}
                         </p>
@@ -38,13 +38,13 @@ export default function EntrySummary({ summary }: { summary: IRecordSummary }) {
                 </Card>
 
                 <Card>
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2! p-4">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <ArrowUpRight className="h-4 w-4 text-expense" />
                             Total Cash Out
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='p-4 pt-0'>
                         <p className="text-2xl font-bold text-expense">
                             {formatCurrency(summary.totalCashOut)}
                         </p>
@@ -52,13 +52,13 @@ export default function EntrySummary({ summary }: { summary: IRecordSummary }) {
                 </Card>
 
                 <Card>
-                    <CardHeader className="pb-2">
+                    <CardHeader className="pb-2! p-4">
                         <CardTitle className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                             <Wallet className="h-4 w-4 text-primary" />
                             Net Balance
                         </CardTitle>
                     </CardHeader>
-                    <CardContent>
+                    <CardContent className='p-4 pt-0'>
                         <p
                             className={`text-2xl font-bold ${(summary.currentBalance >= 0) ? "text-income" : "text-expense"
                                 }`}

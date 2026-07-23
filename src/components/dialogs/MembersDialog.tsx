@@ -1,5 +1,5 @@
 import { useEffect, useState, type ReactNode } from "react";
-import { BookPlus, Check, UserPlus, X } from "lucide-react";
+import { Check, UserPlus, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -20,9 +20,17 @@ import { Badge } from "../ui/badge";
 import { useFindUserQuery } from "@/redux/baseApi";
 import { useDebounce } from "@/hooks/useDebounce";
 import { IUser } from "@/types/IUser";
-import AddMember from "../AddMember/AddMember";
 import { useRecordPermissions } from "@/hooks/useRecordPermissions";
 import { addMemberValidation } from "@/formik/validations/record.validation";
+import RemoveMemberPopup from "../popup/RemoveMemberPopup";
+import MemberMenu from "../dropdownMenu/MemberMenu";
+import ConfirmationDialog from "./ConfirmationDialog";
+import { useRecordHandlers } from "../handlers/record.handlers";
+import RemoveMemberDialog from "../members/RemoveMemberDialog";
+import AddMemberForm from "../members/AddMemberForm";
+import AddMember from "../members/AddMember";
+import MembersList from "../members/MembersList";
+import ChangeRoleDialog from "../members/ChangeRoleDialog";
 
 interface MembersDialogProps {
   open: boolean;
@@ -30,30 +38,51 @@ interface MembersDialogProps {
   record: IRecord;
   trigger?: ReactNode
 }
+type MemberDialog =
+  | {
+    type: "remove";
+    member: IMember;
+  }
+  | {
+    type: "change-role";
+    member: IMember;
+  }
+  | null;
+type Step = "find-user" | "select-role";
 
 export function MembersDialog({ open, onOpenChange, record, trigger }: MembersDialogProps) {
   const { user, canManageMembers } = useRecordPermissions(record)
   const [selectedUser, setSelectedUser] = useState<IUser | undefined>()
-  const [memberError, setMemberError] = useState<string>();
-  type Step = "find-user" | "select-role";
   const [step, setStep] = useState<Step>("find-user");
   const members = record.members ?? [];
 
+  const [dialog, setDialog] =
+    useState<MemberDialog>(null);
+
+  const handleClose = (open: boolean) => {
+    if (!open) {
+      setStep("find-user");
+      setSelectedUser(undefined);
+      setDialog(null)
+    }
+
+    onOpenChange(open);
+  };
   return (
     <Dialog
       open={open}
-      onOpenChange={(value) => {
-        if (!value) {
-          setStep("find-user");
-          setSelectedUser(undefined);
-        }
-
-        onOpenChange(value);
-      }}
+      onOpenChange={handleClose}
     >
       <DialogContent>
-        {step === "find-user" ?
-          <div>
+        {dialog?.type === "change-role" ? (
+          <ChangeRoleDialog
+            member={dialog.member}
+            recordId={record._id}
+            onBack={() => setDialog(null)}
+            onSuccess={() => setDialog(null)}
+          />
+        ) : (step === "find-user" ?
+          <>
             <DialogHeader>
               <DialogTitle>Members of {record.title} book</DialogTitle>
               <DialogDescription>
@@ -61,113 +90,46 @@ export function MembersDialog({ open, onOpenChange, record, trigger }: MembersDi
               </DialogDescription>
             </DialogHeader>
 
-            <div className="mt-4">
-              {canManageMembers &&
-                <div className="mb-4">
-                  <Formik
-                    initialValues={{ email: "" }}
-                    validationSchema={addMemberValidation}
-                    enableReinitialize
-                    onSubmit={() => {
-                      if (selectedUser) {
-                        setStep("select-role");
-                      }
-                    }}
-                  >
-                    {({ errors }) => (
-                      <Form className="space-y-3">
-                        <div className="grid gap-2 grid-cols-1 mb-3">
-                          <div className="relative">
-                            <FormikInput
-                              label="Email"
-                              name="email"
-                              required
-                            />
-
-                            <FindUser
-                              onFound={setSelectedUser}
-                              members={members}
-                              onAlreadyMember={setMemberError}
-                            />
-                          </div>
-                          {(memberError && !errors.email) && (
-                            <p className="text-xs text-red-500">
-                              {memberError}
-                            </p>
-                          )}
-                          {selectedUser &&
-                            <span className="text-xs text-green-600 font-medium capitalize italic">Record-Book user found! {selectedUser?.fullName}.</span>
-                          }
-                        </div>
-                        <div className="flex justify-end">
-                          <Button type="submit" size="sm" disabled={!selectedUser}>
-                            <UserPlus className="mr-1 h-4 w-4" />
-                            Add Member
-                          </Button>
-                        </div>
-                      </Form>
-                    )}
-                  </Formik>
-                </div>
+            {canManageMembers && (
+              <AddMemberForm
+                members={members}
+                onNext={(user) => {
+                  setSelectedUser(user);
+                  setStep("select-role");
+                }}
+              />
+            )}
+            <MembersList
+              members={members}
+              currentUser={user}
+              canManageMembers={
+                canManageMembers
               }
+              onRemove={(member) =>
+                setDialog({
+                  type: "remove",
+                  member,
+                })
+              }
+              onChangeRole={(member) =>
+                setDialog({
+                  type: "change-role",
+                  member,
+                })
+              }
+            />
+            <DialogFooter>
+              <DialogClose asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                >
+                  Close
+                </Button>
+              </DialogClose>
+            </DialogFooter>
 
-              <div className="space-y-2 border-t border-gray-300 pt-4">
-                <Label className="text-xs text-muted-foreground">
-                  Current members ({members.length})
-                </Label>
-                {members.length === 0 ? (
-                  <p className="rounded-md border border-dashed py-4 text-center text-sm text-muted-foreground">
-                    No members yet
-                  </p>
-                ) : (
-                  <ul className="divide-y rounded-md border">
-                    {members.map((m: IMember) => (
-                      <li
-                        key={m.user._id}
-                        className="flex items-center justify-between px-3 py-2 text-sm"
-                      >
-                        <div>
-                          <p className="font-medium">
-                            {user?._id === m.user._id ? "You" : m.user.fullName}
-                          </p>
-                          {m.user.email && (
-                            <p className="text-xs text-muted-foreground">{m.user.email}</p>
-                          )}
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Badge>{MEMBER_ROLE_LABEL[m.role]}</Badge>
-                          {(user?._id != m.user._id || m.role != 1) &&
-                            canManageMembers && (
-                              <Button
-                                type="button"
-                                variant="ghost"
-                                size="icon"
-                                className="h-7 w-7 text-muted-foreground hover:text-destructive"
-                              //   onClick={() => removeMember(record.id, m.id)}
-                              >
-                                <>
-                                  <X className="h-4 w-4" />
-                                  <span className="sr-only">Remove</span>
-                                </>
-                              </Button>
-                            )
-                          }
-                        </div>
-                      </li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-
-              <DialogFooter className="mt-4">
-                <DialogClose asChild>
-                  <Button type="button" variant="outline">
-                    Close
-                  </Button>
-                </DialogClose>
-              </DialogFooter>
-            </div>
-          </div>
+          </>
           :
           <AddMember
             user={selectedUser}
@@ -176,97 +138,27 @@ export function MembersDialog({ open, onOpenChange, record, trigger }: MembersDi
             onSuccess={() => {
               setSelectedUser(undefined);
               setStep("find-user");
-              onOpenChange(false); // Close dialog
+              // onOpenChange(false);
             }}
           />
+        )
         }
+
+        <RemoveMemberDialog
+          open={dialog?.type === "remove"}
+          member={
+            dialog?.type === "remove"
+              ? dialog.member
+              : null
+          }
+          recordId={record._id}
+          onOpenChange={(open) => {
+            if (!open) {
+              setDialog(null);
+            }
+          }}
+        />
       </DialogContent>
     </Dialog >
-  );
-}
-
-function FindUser({
-  onFound,
-  members,
-  onAlreadyMember,
-}: {
-  onFound: (user: IUser | undefined) => void, members: IMember[], onAlreadyMember: (message?: string) => void;
-}) {
-  const { values, errors } =
-    useFormikContext<{ email: string }>();
-
-  const debouncedEmail = useDebounce(values.email, 500);
-  const shouldSearch =
-    debouncedEmail.length > 0 &&
-    /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(debouncedEmail);
-
-  const {
-    data: foundUser,
-    isFetching,
-    isError,
-    error
-  } = useFindUserQuery(debouncedEmail, {
-    skip: !shouldSearch,
-  });
-
-  const user: IUser | undefined =
-    isFetching || isError ? undefined : foundUser;
-  const alreadyMember =
-    !!user &&
-    members.some((m) => m.user._id === user._id);
-
-  useEffect(() => {
-    if (isFetching) {
-      onAlreadyMember(undefined);
-      onFound(undefined);
-      return;
-    }
-    if (isError && error && 'data' in error && (error.data as any)?.message === "User not found") {
-      onFound(undefined);
-      onAlreadyMember("User not found!");
-      return;
-    }
-
-    if (!user) {
-      onAlreadyMember(undefined);
-      onFound(undefined);
-      return;
-    }
-
-    if (alreadyMember) {
-      onFound(undefined);
-      onAlreadyMember("This user is already a member.");
-      return;
-    }
-
-    onAlreadyMember(undefined);
-    onFound(user);
-    console.log(errors);
-
-  }, [
-    isFetching,
-    user,
-    alreadyMember,
-    onFound,
-    onAlreadyMember,
-  ]);
-
-  return (
-    <span className="absolute right-3 top-9">
-      {isFetching && (
-        <Loader
-          type="spinner"
-          classes="!w-4 !h-4 !border-[3px]"
-        />
-      )}
-
-      {!isFetching && user && !alreadyMember && (
-        <Check className="h-4 w-4 text-green-600" />
-      )}
-
-      {!isFetching && (isError || alreadyMember) && (
-        <X className="h-4 w-4 text-red-600" />
-      )}
-    </span>
   );
 }

@@ -2,7 +2,7 @@ import { IUser } from "@/types/IUser"
 import { DialogContent, DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog"
 import { Badge } from "../ui/badge"
 import { useState } from "react"
-import { MEMBER_ROLE_LABEL } from "@/utils/common"
+import { initialsGenerate, MEMBER_ROLE_LABEL } from "@/utils/common"
 import { Info } from "lucide-react"
 import { Button } from "../ui/button"
 import { useRecordHandlers } from "../handlers/record.handlers"
@@ -48,6 +48,7 @@ const roleInfo = [
 interface AddMemberProps {
     user?: IUser;
     recordId: string;
+    isChangeRole?: boolean;
     onBack: () => void;
     onSuccess: () => void;
 }
@@ -68,7 +69,7 @@ const AddMember = ({ user, recordId, onBack, onSuccess }: AddMemberProps) => {
             <div className="mt-4">
                 <div className="border rounded p-3 flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                        <span className="bg-gray-400 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg">{user?.initials}</span>
+                        <span className="bg-gray-400 text-white w-10 h-10 rounded-full flex items-center justify-center text-lg">{initialsGenerate(user?.fullName)}</span>
                         <div>
                             <p className="text-lg font-medium capitalize">{user?.fullName}</p>
                             <p className="">{user?.email}</p>
@@ -133,7 +134,7 @@ const AddMember = ({ user, recordId, onBack, onSuccess }: AddMemberProps) => {
                         disabled={addMemberLoading}
                         onClick={() => handleAddMember(data, recordId, onSuccess)}
                     >
-                        Add Member
+                        {addMemberLoading ? "Adding " : "Add"} Member
                     </Button>
                 </div>
             </div>

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "@/redux/store/store";
 import { useLogoutMutation } from "@/redux/baseApi";
 import { useRouter } from "next/navigation";
+import { initialsGenerate } from "@/utils/common";
 
 export function ProfileMenu() {
     const router = useRouter()
@@ -14,13 +15,15 @@ export function ProfileMenu() {
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                     <div
-                        className="flex cursor-pointer items-center gap-2 rounded-lg border border-transparent px-3 py-2 transition-all duration-200 hover:border-border hover:bg-muted"
+                        className="flex cursor-pointer items-center gap-2 rounded-full sm:rounded-lg border border-primary sm:border-transparent pr-2 sm:px-3 sm:py-2 transition-all duration-200 sm:hover:border-border sm:hover:bg-muted"
                     >
                         <div className="flex h-7 w-7 items-center justify-center rounded-full bg-primary text-xs font-semibold text-primary-foreground">
-                            {user?.initials}
+                            {user &&
+                                initialsGenerate(user?.fullName)
+                            }
                         </div>
 
-                        <div className="flex flex-col">
+                        <div className="sm:flex flex-col hidden">
                             <span className="max-w-40 truncate text-sm font-medium capitalize">
                                 {user?.fullName}
                             </span>
@@ -38,7 +41,9 @@ export function ProfileMenu() {
                             className="flex cursor-pointer items-center gap-3 rounded-lg border border-transparent"
                         >
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
-                                {user?.initials}
+                                {user &&
+                                    initialsGenerate(user?.fullName)
+                                }
                             </div>
 
                             <div className="flex flex-col">

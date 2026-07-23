@@ -1,7 +1,8 @@
 import { ApiResponse } from "@/types/ApiResponse";
 import { baseApi } from "../baseApi";
-import { ADD_MEMBER, CREATE_RECORD, DELETE_RECORD, GET_RECORD, GET_RECORDS, UPDATE_RECORD } from "../routes/routes";
+import { ADD_MEMBER, CREATE_RECORD, DELETE_RECORD, GET_RECORD, GET_RECORDS, REMOVE_MEMBER, UPDATE_MEMBER_ROLE, UPDATE_RECORD } from "../routes/routes";
 import { IRecord } from "@/types/IRecord";
+import { updateRecordCache } from "../helpers/updateRecordCache";
 
 export const RecordApi = baseApi.injectEndpoints({
     endpoints: (builder) => ({
@@ -74,8 +75,68 @@ export const RecordApi = baseApi.injectEndpoints({
                 body: data
             }),
             transformResponse: (response: ApiResponse) => response.data,
+            async onQueryStarted({ recordId }, { dispatch, queryFulfilled }) {
+                let patch;
+                try {
+                    const { data } = await queryFulfilled;
+                    patch = updateRecordCache(
+                        dispatch,
+                        recordId,
+                        (draft) => {
+                            draft.members = data.members;
+                        }
+                    );
+                } catch {
+                    patch?.undo();
+                }
+            },
+        }),
+        removeMember: builder.mutation({
+            query: ({ recordId, memberId }) => ({
+                url: REMOVE_MEMBER(recordId, memberId),
+                method: 'DELETE'
+            }),
+            transformResponse: (response: ApiResponse) => response.data,
+            async onQueryStarted({ recordId }, { dispatch, queryFulfilled }) {
+                let patch;
+                try {
+                    const { data } = await queryFulfilled;
+                    patch = updateRecordCache(
+                        dispatch,
+                        recordId,
+                        (draft) => {
+                            draft.members = data.members;
+                        }
+                    );
+                } catch {
+                    patch?.undo();
+                }
+            },
+        }),
+        updateMemberRole: builder.mutation({
+            query: ({ role, recordId, memberId }) => ({
+                url: UPDATE_MEMBER_ROLE(recordId, memberId),
+                method: 'PATCH',
+                body: { role }
+            }),
+            transformResponse: (response: ApiResponse) => response.data,
+            async onQueryStarted({ recordId }, { dispatch, queryFulfilled }) {
+                let patch;
+                try {
+                    const { data } = await queryFulfilled;
+                    patch = updateRecordCache(
+                        dispatch,
+                        recordId,
+                        (draft) => {
+                            draft.members = data.members;
+                        }
+                    );
+                } catch {
+                    patch?.undo();
+                }
+            },
         })
     })
 })
 
-export const { useGetRecordsQuery, useUpdateRecordMutation, useCreateRecordMutation, useDeleteRecordMutation, useGetRecordByIdQuery, useAddMemberMutation } = RecordApi
+export const { useGetRecordsQuery, useUpdateRecordMutation, useCreateRecordMutation, useDeleteRecordMutation, useGetRecordByIdQuery, useAddMemberMutation, useRemoveMemberMutation, useUpdateMemberRoleMutation } = RecordApi

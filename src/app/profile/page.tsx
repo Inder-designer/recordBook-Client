@@ -41,7 +41,7 @@ export default function page() {
     };
 
     return (
-        <div className="max-w-2xl mx-auto">
+        <div className="max-w-2xl px-3 mx-auto">
             <div className="py-5 flex gap-3 items-center">
                 <button className="cursor-pointer" onClick={() => router.back()}><ArrowLeft /></button>
                 <p className="font-medium text-xl">Your Profile Details</p>

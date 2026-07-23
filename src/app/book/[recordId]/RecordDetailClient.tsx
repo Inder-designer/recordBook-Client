@@ -1,5 +1,5 @@
 "use client"
-import { BookSettingsMenu } from "@/components/bookSettingsMenu/BookSettingsMenu"
+import { BookSettingsMenu } from "@/components/dropdownMenu/BookSettingsMenu"
 import { Button } from "@/components/ui/button"
 import { useGetRecordByIdQuery } from "@/redux/api/record"
 import { ArrowLeft } from "lucide-react"
@@ -38,7 +38,7 @@ export default function RecordDetailClient({
     <div className="min-h-screen bg-background">
       <div className="border-b">
         <header className="max-w-350 mx-auto bg-card">
-          <div className="flex items-center justify-between gap-3 px-4 py-4">
+          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:py-4">
             <div className="flex items-center gap-3">
               <Button variant="ghost" size="icon" asChild>
                 <Link href="/">
@@ -59,7 +59,7 @@ export default function RecordDetailClient({
         </header>
       </div>
 
-      <main className="max-w-350 mx-auto py-4 md:py-6 min-h-[calc(100vh-69px)] bg-black/2 md:bg-transparent">
+      <main className="max-w-350 mx-auto py-4 md:py-6 min-h-[calc(100vh-61px)] sm:min-h-[calc(100vh-69px)] bg-black/2 md:bg-transparent">
         {record && <EntriesList record={record} />}
       </main>
     </div>

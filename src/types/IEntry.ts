@@ -1,3 +1,5 @@
+import { IPagination } from "./common";
+import { IRecordSummary } from "./IRecord";
 import { IUser } from "./IUser";
 
 export type EntryType =
@@ -24,4 +26,28 @@ export interface IEntry {
     transactionDate: string;
     createdAt: string;
     updatedAt: string;
+}
+
+export interface IEntryFilters {
+    page?: number;
+    limit?: number;
+    type?: "cashIn" | "cashOut";
+    paymentMethod?: "cash" | "bank" | "upi" | "card" | "cheque" | "online";
+    member?: string;
+    startDate?: string;
+    endDate?: string;
+}
+
+export interface GetEntriesParams {
+    recordId: string;
+    filters?: IEntryFilters;
+}
+
+export interface GetEntriesResponse {
+    data: IEntry[],
+    message: string,
+    meta: {
+        pagination: IPagination
+        summary: IRecordSummary
+    }
 }

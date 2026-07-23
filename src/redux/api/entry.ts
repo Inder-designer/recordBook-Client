@@ -1,7 +1,7 @@
 import { ApiResponse } from "@/types/ApiResponse";
 import { baseApi } from "../baseApi";
 import { CREATE_ENTRY, DELETE_ENTRY, GET_ENTRIES, UPDATE_ENTRY } from "../routes/routes";
-import { IEntry } from "@/types/IEntry";
+import { GetEntriesParams, GetEntriesResponse, IEntry } from "@/types/IEntry";
 import { RecordApi } from "./record";
 import { IRecord } from "@/types/IRecord";
 import { updateSummary } from "@/utils/common";
@@ -9,9 +9,11 @@ import { updateSummary } from "@/utils/common";
 export const EntryApi = baseApi.injectEndpoints({
     endpoints: (builder) => {
         return {
-            getEntries: builder.query<IEntry[], string>({
-                query: (recordId) => GET_ENTRIES(recordId),
-                transformResponse: (response: ApiResponse) => response.data,
+            getEntries: builder.query<GetEntriesResponse, GetEntriesParams>({
+                query: ({ recordId, filters }) => ({
+                    url: GET_ENTRIES(recordId),
+                    params: filters
+                }),
                 providesTags: ['Entry']
             }),
             createEntry: builder.mutation({
@@ -32,7 +34,7 @@ export const EntryApi = baseApi.injectEndpoints({
                                 "getEntries",
                                 recordId,
                                 (draft) => {
-                                    draft.unshift(entry);
+                                    draft.data.unshift(entry);
                                 }
                             )
                         );
@@ -70,11 +72,11 @@ export const EntryApi = baseApi.injectEndpoints({
                                 "getEntries",
                                 recordId,
                                 (draft) => {
-                                    const entryIndex = draft.findIndex((e) => e._id === entryId);
+                                    const entryIndex = draft.data.findIndex((e) => e._id === entryId);
 
                                     if (entryIndex === -1) return;
-                                    previousEntry = { ...draft[entryIndex] };
-                                    Object.assign(draft[entryIndex], entry);
+                                    previousEntry = { ...draft.data[entryIndex] };
+                                    Object.assign(draft.data[entryIndex], entry);
                                 }
                             )
                         );
@@ -108,7 +110,7 @@ export const EntryApi = baseApi.injectEndpoints({
                             getState()
                         ).data;
 
-                        const deletedEntry = entries?.find(
+                        const deletedEntry = entries?.data.find(
                             (entry) => entry._id === entryId
                         );
 
@@ -121,12 +123,12 @@ export const EntryApi = baseApi.injectEndpoints({
                                 "getEntries",
                                 recordId,
                                 (draft) => {
-                                    const index = draft.findIndex(
+                                    const index = draft.data.findIndex(
                                         (entry: IEntry) => entry._id === entryId
                                     );
 
                                     if (index !== -1) {
-                                        draft.splice(index, 1);
+                                        draft.data.splice(index, 1);
                                     }
                                 }
                             )

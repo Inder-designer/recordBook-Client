@@ -11,6 +11,8 @@ import { useRecordPermissions } from "@/hooks/useRecordPermissions";
 import { IEntry } from "@/types/IEntry";
 import { IRecord } from "@/types/IRecord";
 import { useState } from "react";
+import EntryFilters from "./EntryFilters";
+import Loader from "@/components/Loader/Loader";
 
 interface Props {
     record: IRecord;
@@ -30,7 +32,7 @@ export default function EntriesList({
     record,
 }: Props) {
     const { user, canManageEntries, canAddEntry } = useRecordPermissions(record);
-    const { entries, entriesWithBalance, summary, isLoading } = useEntries(record._id)
+    const { entries, entriesWithBalance, summary, isLoading, isFetching, filters, updateFilters } = useEntries(record._id)
 
     const [dialog, setDialog] = useState<DialogState>(null);
 
@@ -43,20 +45,41 @@ export default function EntriesList({
 
     const handleDelete = (entry: IEntry) =>
         setDialog({ type: "delete", entry });
+    const isFilter = !!(filters.type || filters.paymentMethod || filters.member || filters.startDate || filters.endDate)
 
     return (
         <div>
-            <EntrySummary summary={summary} />
+            <>
+                <EntryFilters
+                    isFilter={isFilter}
+                    filters={filters}
+                    onChange={(filters) =>
+                        updateFilters({
+                            ...filters,
+                            page: 1, // Reset pagination whenever filters change
+                        })
+                    }
+                    members={record.members}
+                />;
+            </>
+            {summary &&
+                <EntrySummary summary={summary} />
+            }
             <EntryHeader
-                total={summary.totalTransactions}
+                total={summary?.totalTransactions ?? 0}
                 canAddEntry={canAddEntry}
                 recordId={record._id}
             />
             <div>
 
 
-                {!entries.length ? (
+                {(isLoading || isFetching) ? (
+                    <div className="flexCenter pt-6">
+                        <Loader type="bar" />
+                    </div>
+                ) : !entries.length ? (
                     <EntryEmptyState
+                        isFilter={isFilter}
                         title={record.title}
                         canAddEntry={canAddEntry}
                     />

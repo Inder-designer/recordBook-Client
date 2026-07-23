@@ -1,4 +1,4 @@
-import { useAddMemberMutation, useCreateRecordMutation, useDeleteRecordMutation, useUpdateRecordMutation } from "@/redux/api/record"
+import { useAddMemberMutation, useCreateRecordMutation, useDeleteRecordMutation, useRemoveMemberMutation, useUpdateMemberRoleMutation, useUpdateRecordMutation } from "@/redux/api/record"
 import type { IRecordFormValues } from "@/formik/validations/record.validation"
 import { toast } from "sonner"
 import { showConfirmDialog, showLoadingDialog } from "../dialogs/Comman"
@@ -10,6 +10,8 @@ export const useRecordHandlers = () => {
     const [updateRecord, { isLoading: updateRecordLoading }] = useUpdateRecordMutation()
     const [deleteRecord, { isLoading: deleteRecordLoading }] = useDeleteRecordMutation()
     const [addMember, { isLoading: addMemberLoading }] = useAddMemberMutation()
+    const [removeMember, { isLoading: removeMemberLoading }] = useRemoveMemberMutation()
+    const [updateMemberRole, { isLoading: updateMemberRoleLoading }] = useUpdateMemberRoleMutation()
 
     const handleSaveRecord = async ({
         values,
@@ -86,13 +88,48 @@ export const useRecordHandlers = () => {
         }
     }
 
+    const handleRemoveMember = async (recordId: string, memberId?: string, onSuccess?: () => void) => {
+        try {
+            const res = await removeMember({ recordId, memberId }).unwrap()
+            toast.success(
+                res.message ||
+                "Member removed successfully"
+            );
+            onSuccess?.();
+        } catch (error: any) {
+            toast.error(
+                error?.data?.message ||
+                "Failed to remove member"
+            );
+        }
+    }
+    const handleUpdateMemberRole = async (recordId: string, memberId?: string, role?: number, onSuccess?: () => void) => {
+        try {
+            const res = await updateMemberRole({ recordId, memberId, role }).unwrap()
+            toast.success(
+                res.message ||
+                "Member role updated successfully"
+            );
+            onSuccess?.();
+        } catch (error: any) {
+            toast.error(
+                error?.data?.message ||
+                "Failed to update member role"
+            );
+        }
+    }
+
     return {
         handleSaveRecord,
         handleDeleteRecord,
         handleAddMember,
+        handleRemoveMember,
+        handleUpdateMemberRole,
 
         isloading: createRecordLoading || updateRecordLoading,
         deleteRecordLoading,
-        addMemberLoading
+        addMemberLoading,
+        removeMemberLoading,
+        updateMemberRoleLoading
     }
 }
