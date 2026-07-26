@@ -1,5 +1,5 @@
 "use client";
-import { useState, type ReactNode } from "react";
+import { useEffect, useState, type ReactNode } from "react";
 import { ArrowDownLeft, ArrowUpRight, Minus, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -56,9 +56,12 @@ export function AddAndEditEntryDialog({ open, onOpenChange, entry, recordId, typ
     }
   };
 
+  console.log(entryType);
+  
+
   return (
     <Dialog open={dialogOpen} onOpenChange={setDialogOpen}>
-      {!isControlled && (
+      {/* {!isControlled && (
         <DialogTrigger asChild>
           {trigger ?? (
             <Button size="sm" variant={entryType === "cashIn" ? "default" : "destructive"}>
@@ -71,7 +74,7 @@ export function AddAndEditEntryDialog({ open, onOpenChange, entry, recordId, typ
             </Button>
           )}
         </DialogTrigger>
-      )}
+      )} */}
       <DialogContent>
         <DialogHeader>
           <DialogTitle>{entry ? "Edit" : "Add"}{" "}  <span>{entryType === "cashIn" ? "Cash In" : "Cash Out"}</span> Entry</DialogTitle>
