@@ -37,7 +37,7 @@ const baseQueryWithAuth: BaseQueryFn<
 export const baseApi = createApi({
     reducerPath: 'baseApi',
     baseQuery: baseQueryWithAuth,
-    tagTypes: ['Auth', 'USER', "RECORDS", "RECORD", "Entry"],
+    tagTypes: ['Auth', 'USER', "RECORDS", "RECORD", "Entries"],
     endpoints: (builder) => ({
         getMe: builder.query({
             query: () => GET_ME,

@@ -1,6 +1,6 @@
 export default function HomePageSkeleton() {
     return (
-        <div className="max-w-350 w-full mx-auto min-h-screen bg-background animate-pulse">
+        <div className="max-w-350 w-full mx-auto bg-background animate-pulse">
 
             <main className="px-4 py-6">
                 {/* Balance Card */}

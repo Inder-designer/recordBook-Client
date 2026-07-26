@@ -3,7 +3,7 @@ import * as Yup from "yup";
 
 export interface IEntryFormValues {
     type: "cashIn" | "cashOut";
-    amount: number;
+    amount: string;
     remark: string;
     category: string;
     paymentMethod: "cash" | "bank" | "upi" | "card" | "cheque";
@@ -15,10 +15,11 @@ export const createEntryValidation = Yup.object({
         .oneOf(["cashIn", "cashOut"])
         .required("Transaction type is required"),
 
-    amount: Yup.number()
-        .typeError("Amount must be a number")
-        .positive("Amount must be greater than 0")
-        .max(999999999, "Amount limit reached")
+    amount: Yup.string()
+        .matches(
+            /^[0-9.+\-*/%]+$/,
+            "Only numbers, decimal point and +, -, *, /, % are allowed"
+        )
         .required("Amount is required"),
 
     remark: Yup.string()
@@ -43,18 +44,27 @@ const localDate = new Date(
 )
     .toISOString()
     .split("T")[0];
+const formatLocalDate = (date: string | Date) => {
+    const d = new Date(date);
+
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, "0");
+    const day = String(d.getDate()).padStart(2, "0");
+
+    return `${year}-${month}-${day}`;
+};
 
 export const entryInitialValues = (
     type: "cashIn" | "cashOut",
     entry?: Partial<IEntry>
 ): IEntryFormValues => ({
     type: entry?.type ?? type,
-    amount: entry?.amount ?? 0,
+    amount: entry?.amount ?? "",
     remark: entry?.remark ?? "",
     category: entry?.category ?? "",
     paymentMethod: entry?.paymentMethod ?? "cash",
     transactionDate: entry?.transactionDate
-        ? new Date(entry.transactionDate).toISOString().split("T")[0]
+        ? formatLocalDate(entry.transactionDate)
         : localDate,
 });
 

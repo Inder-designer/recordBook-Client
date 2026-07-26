@@ -1,6 +1,6 @@
 "use client";
 
-import { AddAndEditTransactionDialog } from "@/components/dialogs/AddAndEditTransactionDialog";
+import { AddAndEditEntryDialog } from "@/components/dialogs/AddAndEditEntryDialog";
 import { DeleteEntryDialog } from "@/components/dialogs/DeleteEntryDialog";
 import { IEntry } from "@/types/IEntry";
 import { useEntryHandlers } from "../handlers/entry.handlers";
@@ -32,7 +32,7 @@ export default function EntryDialogs({
 
     if (dialog.type === "edit") {
         return (
-            <AddAndEditTransactionDialog
+            <AddAndEditEntryDialog
                 open
                 onOpenChange={(open) => {
                     if (!open) {

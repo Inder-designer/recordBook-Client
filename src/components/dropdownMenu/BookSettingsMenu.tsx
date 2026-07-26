@@ -73,7 +73,7 @@ export function BookSettingsMenu({ record }: { record: IRecord }) {
         <>
             <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                    <Button variant="outline" size="icon" aria-label="Book settings">
+                    <Button variant="ghost" size="icon" aria-label="Book settings">
                         <Settings className="h-4 w-4" />
                     </Button>
                 </DropdownMenuTrigger>

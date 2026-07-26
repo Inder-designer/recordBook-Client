@@ -18,8 +18,8 @@ export default function MainLayout({
     // if (isLoading) return <Loader />;
     return (
         <div className="relative w-full mx-auto">
-            {isHomePage && <Header />}
-            <div className={``}>{children}</div>
+            <Header />
+            <div className={`max-w-350 mx-auto`}>{children}</div>
         </div>
     );
 }

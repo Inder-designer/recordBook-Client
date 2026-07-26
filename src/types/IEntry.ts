@@ -18,7 +18,7 @@ export interface IEntry {
     recordId: string;
     createdBy: IUser;
     type: EntryType;
-    amount: number;
+    amount: string;
     balance: number;
     remark?: string;
     category?: string;
@@ -40,7 +40,7 @@ export interface IEntryFilters {
 
 export interface GetEntriesParams {
     recordId: string;
-    filters?: IEntryFilters;
+    // filters?: IEntryFilters;
 }
 
 export interface GetEntriesResponse {

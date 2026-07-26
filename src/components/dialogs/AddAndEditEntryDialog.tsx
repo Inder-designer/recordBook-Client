@@ -17,6 +17,7 @@ import { createEntryValidation, entryInitialValues } from "@/formik/validations/
 import { FormikInput } from "../CommanFields/FormikInput";
 import { useEntryHandlers } from "../handlers/entry.handlers";
 import { IEntry } from "@/types/IEntry";
+import { calculateAmount, isCalculation } from "@/utils/calculateAmount";
 
 interface Props {
   open?: boolean;
@@ -37,7 +38,7 @@ const options = [
     value: "online"
   },
 ]
-export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordId, type, trigger }: Props) {
+export function AddAndEditEntryDialog({ open, onOpenChange, entry, recordId, type, trigger }: Props) {
   const [entryType, setEntryType] = useState(entry?.type || type)
   const { handleSaveEntry, isLoading } = useEntryHandlers()
   const [action, setAction] = useState<"save" | "saveAndNew">("save");
@@ -82,6 +83,16 @@ export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordI
             enableReinitialize
             onSubmit={(values, { resetForm }) => {
               if (!recordId) return;
+              const calculatedAmount = calculateAmount(values.amount);
+
+              if (calculatedAmount === "Invalid calculation") {
+                return;
+              }
+
+              const payload = {
+                ...values,
+                amount: calculatedAmount,
+              };
 
               const onSuccess = () => {
                 if (action === "save") {
@@ -97,13 +108,13 @@ export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordI
               };
 
               if (entry) {
-                handleSaveEntry({ values, recordId, entryId: entry._id, onSuccess });
+                handleSaveEntry({ values: payload, recordId, entryId: entry._id, onSuccess });
               } else {
-                handleSaveEntry({ values, recordId, onSuccess });
+                handleSaveEntry({ values: payload, recordId, onSuccess });
               }
             }}
           >
-            {({ values, setFieldValue }) => (
+            {({ values, dirty, setFieldValue }) => (
               <Form>
                 <div className="space-y-4">
                   <div className="space-y-2">
@@ -141,10 +152,15 @@ export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordI
                   <div className="space-y-2">
                     <FormikInput
                       label="Amount"
-                      type="number"
+                      // type="number"
                       name="amount"
                       required
                     />
+                    {values.amount && isCalculation(values.amount) && (
+                      <div className="text-sm text-muted-foreground">
+                        Result: <span className="font-medium">{calculateAmount(values.amount)}</span>
+                      </div>
+                    )}
                   </div>
                   <div className="space-y-2">
                     <FormikInput
@@ -185,7 +201,7 @@ export function AddAndEditTransactionDialog({ open, onOpenChange, entry, recordI
                     <Button
                       type="submit"
                       onClick={() => setAction("save")}
-                      disabled={isLoading}
+                      disabled={(entry && !dirty) || isLoading}
                     >
                       {isLoading
                         ? entry

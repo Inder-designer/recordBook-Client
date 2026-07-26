@@ -1,4 +1,4 @@
-import { AddAndEditTransactionDialog } from '../dialogs/AddAndEditTransactionDialog'
+import { AddAndEditEntryDialog } from '../dialogs/AddAndEditEntryDialog'
 
 interface EntryHeaderProps {
     total: number,
@@ -15,8 +15,8 @@ export default function EntryHeader({ total, canAddEntry, recordId }: EntryHeade
                 </h2>
                 {canAddEntry && (
                     <div className="flex gap-2">
-                        <AddAndEditTransactionDialog recordId={recordId} type="cashIn" />
-                        <AddAndEditTransactionDialog recordId={recordId} type="cashOut" />
+                        <AddAndEditEntryDialog recordId={recordId} type="cashIn" />
+                        <AddAndEditEntryDialog recordId={recordId} type="cashOut" />
                     </div>
                 )}
             </div>

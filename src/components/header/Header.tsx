@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation"
 const Header = () => {
     const router = useRouter()
     return (
-        <div className="border-b">
-            <header className="max-w-350 mx-auto bg-card">
+        <header className="border-b shadow z-1 sticky top-0">
+            <div className="max-w-350 mx-auto bg-card">
                 <div className="mx-auto flex items-center justify-between gap-3 px-4 py-3.5 sm:py-4">
                     <div className="flex items-center gap-2 sm:gap-3">
                         <div className="flex h-8 sm:h-10 w-8 sm:w-10 items-center justify-center rounded-lg bg-primary">
@@ -23,8 +23,8 @@ const Header = () => {
                     </div>
                     <ProfileMenu />
                 </div>
-            </header>
-        </div>
+            </div>
+        </header>
     )
 }
 

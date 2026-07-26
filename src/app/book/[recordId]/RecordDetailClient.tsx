@@ -20,11 +20,13 @@ export default function RecordDetailClient({
     error,
   } = useGetRecordByIdQuery(recordId);
   if (isLoading) {
-    return <Loader />;
+    return <div className="flexCenter py-10">
+      <Loader type="bar" />
+    </div>;
   }
 
   if (error) {
-    return <div className="min-h-screen flex items-center justify-center bg-gray-100">
+    return <div className="min-h-[calc(100vh-61px)] sm:min-h-[calc(100vh-79px)] flex items-center justify-center">
       <div className="text-center">
         <h1 className="text-4xl font-bold mb-4">404</h1>
         <p className="text-xl text-gray-600 mb-4">Oops! Record not found</p>
@@ -35,31 +37,29 @@ export default function RecordDetailClient({
     </div>;
   }
   return (
-    <div className="min-h-screen bg-background">
-      <div className="border-b">
-        <header className="max-w-350 mx-auto bg-card">
-          <div className="flex items-center justify-between gap-3 px-4 py-3 sm:py-4">
-            <div className="flex items-center gap-3">
-              <Button variant="ghost" size="icon" asChild>
-                <Link href="/">
-                  <ArrowLeft className="h-5 w-5" />
-                  <span className="sr-only">Back</span>
-                </Link>
-              </Button>
-              <div>
-                <h1 className="text-xl font-bold tracking-tight text-foreground capitalize">
-                  {record?.title}
-                </h1>
-              </div>
-            </div>
-            <div className="flex items-center gap-2">
-              {record && <BookSettingsMenu record={record} />}
+    <div className="bg-background">
+      <header className="bg-card px-4">
+        <div className="flex items-center justify-between gap-3 py-3 sm:py-4 border-b">
+          <div className="flex items-center gap-3">
+            <Button variant="ghost" size="icon" asChild>
+              <Link href="/">
+                <ArrowLeft className="h-5 w-5" />
+                <span className="sr-only">Back</span>
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-xl font-bold tracking-tight text-foreground capitalize">
+                {record?.title}
+              </h1>
             </div>
           </div>
-        </header>
-      </div>
+          <div className="flex items-center gap-2">
+            {record && <BookSettingsMenu record={record} />}
+          </div>
+        </div>
+      </header>
 
-      <main className="max-w-350 mx-auto py-4 md:py-6 min-h-[calc(100vh-61px)] sm:min-h-[calc(100vh-69px)] bg-black/4 md:bg-transparent">
+      <main className="py-4 md:py-6 min-h-[calc(100vh-122px)] sm:min-h-[calc(100vh-147px)] bg-black/4 md:bg-transparent">
         {record && <EntriesList record={record} />}
       </main>
     </div>

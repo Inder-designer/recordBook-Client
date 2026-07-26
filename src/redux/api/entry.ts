@@ -9,12 +9,10 @@ import { updateSummary } from "@/utils/common";
 export const EntryApi = baseApi.injectEndpoints({
     endpoints: (builder) => {
         return {
-            getEntries: builder.query<GetEntriesResponse, GetEntriesParams>({
-                query: ({ recordId, filters }) => ({
-                    url: GET_ENTRIES(recordId),
-                    params: filters
-                }),
-                providesTags: ['Entry']
+            getEntries: builder.query<GetEntriesResponse, string>({
+                query: (recordId) => GET_ENTRIES(recordId),
+                // transformResponse: (response: ApiResponse) => response.data,
+                providesTags: ['Entries']
             }),
             createEntry: builder.mutation({
                 query: ({ data, recordId }) => ({
@@ -29,11 +27,14 @@ export const EntryApi = baseApi.injectEndpoints({
                     try {
                         await queryFulfilled;
                         const { data: entry } = await queryFulfilled;
+                        console.log("🚀 ~ entry:", entry)
                         entriesPatch = dispatch(
                             EntryApi.util.updateQueryData(
                                 "getEntries",
                                 recordId,
                                 (draft) => {
+                                    console.log("🚀 ~ draft:1")
+                                    console.log("🚀 ~ draft:", draft)
                                     draft.data.unshift(entry);
                                 }
                             )
@@ -64,14 +65,16 @@ export const EntryApi = baseApi.injectEndpoints({
                     let entriesPatch;
                     let recordsPatch;
                     try {
-                        await queryFulfilled;
                         const { data: entry } = await queryFulfilled;
+                        console.log("🚀 ~ entry:", entry)
                         let previousEntry: IEntry | undefined;
                         entriesPatch = dispatch(
                             EntryApi.util.updateQueryData(
                                 "getEntries",
                                 recordId,
                                 (draft) => {
+                                    console.log("🚀 ~ draft:2")
+                                    console.log("🚀 ~ draft:", draft)
                                     const entryIndex = draft.data.findIndex((e) => e._id === entryId);
 
                                     if (entryIndex === -1) return;
