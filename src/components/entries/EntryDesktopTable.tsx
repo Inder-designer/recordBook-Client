@@ -72,7 +72,7 @@ export default function EntryDesktopTable({ entries, user, canManageEntries, onE
                                             }`}
                                     >
                                         {isCashIn ? "+" : "-"}
-                                        {formatCurrency(tx.amount)}
+                                        {formatCurrency(Number(tx.amount))}
 
                                     </TableCell>
                                     <TableCell className="whitespace-nowrap text-right font-semibold">

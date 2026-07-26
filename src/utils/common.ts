@@ -35,11 +35,11 @@ export const updateSummary = (
   summary.totalTransactions += multiplier;
 
   if (entry.type === "cashIn") {
-    summary.totalCashIn += entry.amount * multiplier;
-    summary.currentBalance += entry.amount * multiplier;
+    summary.totalCashIn += Number(entry.amount) * multiplier;
+    summary.currentBalance += Number(entry.amount) * multiplier;
   } else {
-    summary.totalCashOut += entry.amount * multiplier;
-    summary.currentBalance -= entry.amount * multiplier;
+    summary.totalCashOut += Number(entry.amount) * multiplier;
+    summary.currentBalance -= Number(entry.amount) * multiplier;
   }
 };
 

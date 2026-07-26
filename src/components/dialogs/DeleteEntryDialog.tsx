@@ -97,7 +97,7 @@ export function DeleteEntryDialog({
                                 </p>
 
                                 <p className="font-semibold">
-                                    {formatCurrency(entry.amount)}
+                                    {formatCurrency(Number(entry.amount))}
                                 </p>
                             </div>
 

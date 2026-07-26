@@ -44,7 +44,7 @@ export default function EntryMobileList({ entries, user, canManageEntries, onEdi
                         </div>
                         <div className="shrink-0 flex flex-col gap-1 text-right tracking-wide">
                             <span className={`font-medium ${tx.type === "cashIn" ? "text-income" : "text-expense"}`}>
-                                {formatCurrency(tx.amount)}
+                                {formatCurrency(Number(tx.amount))}
                             </span>
                             <span className={`text-xs sm:text-sm text-muted-foreground`}>
                                 Balance: {formatCurrency(tx.balance)}
