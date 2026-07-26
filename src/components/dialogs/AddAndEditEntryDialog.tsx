@@ -84,6 +84,7 @@ export function AddAndEditEntryDialog({ open, onOpenChange, entry, recordId, typ
             onSubmit={(values, { resetForm }) => {
               if (!recordId) return;
               const calculatedAmount = calculateAmount(values.amount);
+              console.log("🚀 ~ AddAndEditEntryDialog ~ calculatedAmount:", calculatedAmount)
 
               if (calculatedAmount === "Invalid calculation") {
                 return;

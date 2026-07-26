@@ -31,7 +31,7 @@ export default function useEntries(recordId?: string) {
             page: 1,
         }));
     };
-
+    console.log(filters);
 
     const filteredEntries = useMemo(() => {
         return entries.filter((entry) => {
@@ -63,6 +63,14 @@ export default function useEntries(recordId?: string) {
                     new Date(filters.endDate)
                 )
                     return false;
+            }
+            if (filters.search) {
+                const search = filters.search.trim().toLowerCase()
+                const matchesSearch =
+                    entry.remark?.toLowerCase().includes(search) ||
+                    entry.amount.toString().includes(search);
+
+                if (!matchesSearch) return false;
             }
 
             return true;

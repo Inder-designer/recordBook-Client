@@ -1,10 +1,9 @@
 "use client";
 
-import { CalendarIcon, ChevronDownIcon, X } from "lucide-react";
+import { ChevronDownIcon, Search, X } from "lucide-react";
 import { format } from "date-fns";
 
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
 import {
     Select,
     SelectContent,
@@ -18,13 +17,12 @@ import {
     PopoverTrigger,
 } from "@/components/ui/popover";
 import { Calendar } from "@/components/ui/calendar";
-import { cn } from "@/lib/utils";
 import { IMember } from "@/types/IRecord";
 import { IEntryFilters } from "@/types/IEntry";
-import { DateRange } from "react-day-picker";
 import { presets } from "@/utils/common";
 import { useEffect, useState } from "react";
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
 
 
 export interface EntryFiltersValue {
@@ -75,8 +73,8 @@ export default function EntryFilters({
         }
     }, [calendarOpen, filters.startDate, filters.endDate]);
     return (
-        <div className="mb-6 px-4">
-            <div className="flex flex-wrap gap-4">
+        <div className="mb-4 px-4">
+            <div className="flex flex-wrap gap-3 sm:gap-4">
                 {/* Entry Type */}
                 <div className="space-y-2">
                     <Select
@@ -301,6 +299,7 @@ export default function EntryFilters({
                                 member: undefined,
                                 startDate: undefined,
                                 endDate: undefined,
+                                search: undefined,
                             })
                         }
                     >
@@ -309,7 +308,21 @@ export default function EntryFilters({
                     </button>
                 }
             </div>
-
+            <div className="mt-3 sm:mt-4 relative">
+                <span className="absolute left-2 top-1/2 -translate-y-1/2"><Search className="w-5 h-5 text-primary/80!" /></span>
+                <div>
+                    <Input
+                        value={filters.search || ""}
+                        className="bg-white pl-10"
+                        placeholder="Search by remark or amount..."
+                        onChange={(e) => {
+                            onChange({
+                                search: e.target.value
+                            })
+                        }}
+                    />
+                </div>
+            </div>
         </div>
     );
 }

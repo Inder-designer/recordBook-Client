@@ -59,7 +59,7 @@ export const entryInitialValues = (
     entry?: Partial<IEntry>
 ): IEntryFormValues => ({
     type: entry?.type ?? type,
-    amount: entry?.amount ?? "",
+    amount: entry?.amount?.toString() ?? "",
     remark: entry?.remark ?? "",
     category: entry?.category ?? "",
     paymentMethod: entry?.paymentMethod ?? "cash",

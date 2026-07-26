@@ -45,7 +45,7 @@ export default function EntriesList({
 
     const handleDelete = (entry: IEntry) =>
         setDialog({ type: "delete", entry });
-    const isFilter = !!(filters.type || filters.paymentMethod || filters.member || filters.startDate || filters.endDate)
+    const isFilter = !!(filters.type || filters.paymentMethod || filters.member || filters.startDate || filters.endDate || filters.search)
 
     return (
         <div>

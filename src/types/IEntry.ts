@@ -36,6 +36,7 @@ export interface IEntryFilters {
     member?: string;
     startDate?: string;
     endDate?: string;
+    search?: string;
 }
 
 export interface GetEntriesParams {
